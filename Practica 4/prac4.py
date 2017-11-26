@@ -21,6 +21,27 @@ def generate_random_ordering(G):
   return np.random.permutation(N)
 
 def generate_greedy_ordering(G):
+  # let's assume that G is a square Numpy matrix of integers 
+  N = G.shape[0] 
+  aux=G.shape[0] 
+  candidatos= [x for x in range(0,N)] 
+  fijados=[] 
+ 
+  #fins que no estigen fixats tots els vertex 
+  while aux>0: 
+    val_max=[] 
+    for i in candidatos: 
+      score=sum(G[j][i]-G[i][j] for j in fijados) 
+      val_max.append((score+sum(G[i][j]-G[j][i] for j in range(0,N) if j not in fijados),i)) 
+ 
+    print("Fijados",fijados,"elijo el máximo de",val_max) 
+    fijados.append(max(val_max)[1]) 
+    candidatos= [x for x in range(0,N) if x not in fijados] 
+    aux-=1 
+ 
+  return fijados 
+
+def alternativa(G):
   # let's assume that G is a square Numpy matrix of integers
   N = G.shape[0]
   aux=G.shape[0]
@@ -108,7 +129,8 @@ G= np.asarray([[0, 8, 3, 2, 9],
 #G = create_graph(N,100)
 #print("G=",G)
 #random_ordering = generate_random_ordering(G)
-G=process_graph(G)
+
+#G=process_graph(G)
 greedy_ordering = generate_greedy_ordering(G)
 #print("random",evaluate(G,random_ordering))
 print("greedy",evaluate(G,greedy_ordering))
