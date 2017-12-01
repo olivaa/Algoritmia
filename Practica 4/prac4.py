@@ -1,3 +1,8 @@
+"""
+Autors: Alejandro Oliva Rodriguez
+	Joan Masanet Lopez
+"""
+
 import numpy as np
 
 def create_graph(N,maxvalue=1000):
@@ -12,7 +17,7 @@ def process_graph(G):
   		for j in range(0,N):
   			G[i][j]=G[i][j]-G[j][i]
   			G[j][i]=0
-  	print(G)
+  	#print(G)
   	return G
 
 def generate_random_ordering(G):
@@ -41,53 +46,7 @@ def generate_greedy_ordering(G):
  
   return fijados 
 
-def alternativa(G):
-  # let's assume that G is a square Numpy matrix of integers
-  N = G.shape[0]
-  aux=G.shape[0]
-  #candidats 
-  candidatos= [x for x in range(0,N)]
-  fijados=[]
 
-  #fins que no estigen fixats tots els vertex
-  while aux>0:
-  	val_max=[]
-  	#creem una matriu on anirem actualizantla introduint els valor corresponents al vertex fixat
-  	g_scores=create_graph(N,1)
-  	for i in candidatos:
-  		#cree matriu nova
-  		g_aux=create_graph(N,1)
-  		#li afegim els valor dels vertex ja fixats
-  		g_aux=g_aux+g_scores
-
-  		for j in range(0,N):
-  			g_aux[i][j]=G[i][j]
-  			g_aux[j][i]=G[j][i]
-
-  		#a la funcio evaluate li pasem un vector amb els vertex ja fixats + el que estem explorant i per ultim la resta de vertes
-  		#aquest ultims vertex no afecten al resultat ja que el seu valors es 0
-  		q=fijados+[i]+[x for x in range(N) if x not in fijados and x != i]
-  		val=evaluate(g_aux,q)
-  		#afegim el resultat per a despres elegir el millor vertex
-  		val_max.append((val,i))
-
-  	print("Fijados",fijados,"elijo el máximo de",val_max)
-  	#agafem el vertex en mes puntuacio
-  	maxim=max(val_max)
-  	#l'afegim a fijados
-  	fijados.append(maxim[1])
-  	#actualizem score
-  	for j in range(0,N):
-  			#print(i,j)
-  			g_scores[maxim[1]][j]=G[maxim[1]][j]
-  			g_scores[j][maxim[1]]=G[j][maxim[1]]
-
-    #actualizamos candidatos
-  	candidatos=[x for x in candidatos if x != maxim[1]]
-  	#rint(fijados,"maxim",g_scores)
-  	aux-=1
-
-  return fijados
   
 def evaluate(G,ordering):
   # assume that G.shape is of type (N,N) and ordering.shape is of type
@@ -128,7 +87,7 @@ G= np.asarray([[0, 8, 3, 2, 9],
 #N = 30
 #G = create_graph(N,100)
 #print("G=",G)
-#random_ordering = generate_random_ordering(G)
+random_ordering = generate_random_ordering(G)
 
 #G=process_graph(G)
 greedy_ordering = generate_greedy_ordering(G)
