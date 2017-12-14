@@ -59,6 +59,8 @@ def evaluate_partial(G,ordering):
              for i in range(N) for j in range(i+1,N))
 
 
+
+
 def BranchAndBound(G):
   # ojo con graph <- "se mira pero no se toca"
   N = G.shape[0]
@@ -66,20 +68,38 @@ def BranchAndBound(G):
   def optimistic(s):
     # s es una lista de vertices entre 0 y N-1
     opt = 0
+    desconocidos=[x for x in range (0,N) if x not in s]
+    print("Desconocidos",desconocidos)
     # COMPLETAR:
     # sumamos la parte conocida:
     # en primer lugar, las aristas entre elementos conocidos:
+    sum_conocidos=evaluate_partial(G,s)
+    print(sum_conocidos)
     # luego la suma entre elementos conocidos y desconocidos:
-    # finalmente sumamos una estimación de la parte desconocida:   
+    sum_con_des=0
+    for x in s:
+    	for i in desconocidos:
+    		#print(evaluate_partial(G,[x,i]))
+    		sum_con_des+=evaluate_partial(G,[x,i])
+    # finalmente sumamos una estimación de la parte desconocida:
+    suma_optimista=0
+    for x in desconocidos:
+    	for y in desconocidos:
+    		print(suma_optimista)
+    		suma_optimista+=G[x][y]
+
+    opt=sum_conocidos+sum_con_des+suma_optimista
+
     return opt
 
   def branch(s):
     return (s+[i] for i in range(N) if i not in s)
 
   def is_complete(s):
-    # COMPLETAR
+    return len(s)==N
 
   A = [] # empty priority queue
+  #alg. voraz
   x = generate_greedy_ordering(G)
   fx = optimistic(x) # equivale a evaluate quando is_complete(x)
 
@@ -102,21 +122,29 @@ def BranchAndBound(G):
       if is_complete(child): # si es terminal
         # seguro que es factible
         # falta ver si mejora la mejor solucion en curso
-        # COMPLETAR
+        cota_child=optimistic(child)
+        if cota_child > fx:
+        	x,fx=child,cota_child
       else: # no es terminal
         # lo metemos en el cjt de estados activos si supera
         # la poda por cota optimista:
-        # COMPLETAR
-
+        opt_child=optimistic(child)
+        if opt_child>fx:
+        	heapq.heappush(A,(-opt_child,child))
   return x,fx
  
 if __name__ == "__main__":
     N = 8
-    G = create_graph(N,5)
+    #G = create_graph(N,5)
+    G= np.array([[0, 8, 3, 2, 9],
+	[3, 0, 3, 8, 2],
+	[0, 2, 0, 6, 2],
+	[4, 4, 8, 0, 0],
+	[7, 7, 6, 2, 0]],dtype=np.int)
     print("G=",G)
     x,fx = BranchAndBound(G)
     greedy_ordering = generate_greedy_ordering(G)
-    print("greedy ordering", greedy_ordering1,evaluate(G,greedy_ordering1))
+    print("greedy ordering", greedy_ordering,evaluate(G,greedy_ordering))
     print("exacto",x,fx,evaluate(G,x))
 
 
